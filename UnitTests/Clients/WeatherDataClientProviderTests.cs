@@ -14,56 +14,98 @@ namespace Forecast.Tests.Clients
         [Fact]
         public void OpenWeather()
         {
+            var openWeather = new Mock<IWeatherDataClient>();
+            var googleWeather = new Mock<IWeatherDataClient>();
+
+            openWeather.Setup(x => x.Provider)
+                .Returns("OpenWeather");
+            googleWeather.Setup(x => x.Provider)
+                .Returns("GoogleWeather");
+
             var clientProvider = new WeatherDataClientProvider( new List<IWeatherDataClient>
             {
-                new Mock<OpenWeatherDataClient>().Object,
-                new Mock<GoogleWeatherDataClient>().Object,
+                openWeather.Object,
+                googleWeather.Object,
             });
 
             var client = clientProvider.GetWeatherDataClient("OpenWeather");
 
-            Assert.IsType<OpenWeatherDataClient>(client);
+            Assert.Equal("OpenWeather", client.Provider);
         }
 
         [Fact]
         public void GoogleWeather()
         {
+            var openWeather = new Mock<IWeatherDataClient>();
+            var googleWeather = new Mock<IWeatherDataClient>();
+
+            openWeather.Setup(x => x.Provider)
+                .Returns("OpenWeather");
+            googleWeather.Setup(x => x.Provider)
+                .Returns("GoogleWeather");
+
             var clientProvider = new WeatherDataClientProvider(new List<IWeatherDataClient>
             {
-                new Mock<OpenWeatherDataClient>().Object,
-                new Mock<GoogleWeatherDataClient>().Object,
+                openWeather.Object,
+                googleWeather.Object,
             });
 
             var client = clientProvider.GetWeatherDataClient("GoogleWeather");
 
-            Assert.IsType<GoogleWeatherDataClient>(client);
+            Assert.Equal("GoogleWeather", client.Provider);
         }
 
         [Fact]
-        public void NullApi()
+        public void NullApiDeffaultOpenWearher()
         {
+            var openWeather = new Mock<IWeatherDataClient>();
+            var googleWeather = new Mock<IWeatherDataClient>();
+
+            openWeather.Setup(x => x.Provider)
+                .Returns("OpenWeather");
+            googleWeather.Setup(x => x.Provider)
+                .Returns("GoogleWeather");
+
             var clientProvider = new WeatherDataClientProvider(new List<IWeatherDataClient>
             {
-                new Mock<OpenWeatherDataClient>().Object,
-                new Mock<GoogleWeatherDataClient>().Object,
+                openWeather.Object,
+                googleWeather.Object,
             });
 
             var client = clientProvider.GetWeatherDataClient(null);
 
-            Assert.IsType<OpenWeatherDataClient>(client);
+            Assert.Equal("OpenWeather", client.Provider);
         }
 
         [Fact]
-        public void UnknownApi()
+        public void UnknownApiException()
         {
+            var openWeather = new Mock<IWeatherDataClient>();
+            var googleWeather = new Mock<IWeatherDataClient>();
+
+            openWeather.Setup(x => x.Provider)
+                .Returns("OpenWeather");
+            googleWeather.Setup(x => x.Provider)
+                .Returns("GoogleWeather");
+
             var clientProvider = new WeatherDataClientProvider(new List<IWeatherDataClient>
             {
-                new Mock<OpenWeatherDataClient>().Object,
-                new Mock<GoogleWeatherDataClient>().Object,
+                openWeather.Object,
+                googleWeather.Object,
             });
 
 
             Assert.Throws<ArgumentException>(() => clientProvider.GetWeatherDataClient("SomeApi"));
+        }
+
+        [Fact]
+        public void NoClientsException()
+        {
+
+            var clientProvider = new WeatherDataClientProvider(new List<IWeatherDataClient>());
+
+
+            Assert.Throws<ArgumentException>(() => clientProvider.GetWeatherDataClient("OpenWeather"));
         }
     }
 }
