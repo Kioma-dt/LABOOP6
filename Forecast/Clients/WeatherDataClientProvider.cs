@@ -6,6 +6,10 @@
     }
     public class WeatherDataClientProvider : IWeatherDataClientProvider
     {
+        public WeatherDataClientProvider(IEnumerable<IWeatherDataClient> clients)
+        {
+            throw new NotImplementedException();
+        }
         public IWeatherDataClient GetWeatherDataClient(string? apiProvider)
         {
             throw new NotImplementedException();
