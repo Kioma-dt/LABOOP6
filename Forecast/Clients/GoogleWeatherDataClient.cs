@@ -5,6 +5,11 @@ namespace Forecast.Clients
     {
         public string Provider => throw new NotImplementedException();
 
+        public GoogleWeatherDataClient(IConfiguration config, HttpClient httpClient) 
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<decimal> LocationCurrentTemperature(decimal latitude, decimal longitude)
         {
             throw new NotImplementedException();
