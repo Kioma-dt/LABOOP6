@@ -71,6 +71,38 @@ namespace Forecast.Tests.Clients
         }
 
         [Fact]
+        public async Task WrongJsonFormat()
+        {
+            var json = """
+                {
+
+                }
+                """;
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(json)
+            };
+
+            var handler = new MyHttpMessageHandler(response);
+            var httpClient = new HttpClient(handler);
+
+            var inMemorySettings = new Dictionary<string, string?>
+            {
+                ["OPENWEATHER_BASE_URL"] = "http://someurl",
+                ["OPENWEATHER_API_KEY"] = "somekey"
+            };
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            var client = new OpenWeatherDataClient(configuration, httpClient);
+
+            await Assert.ThrowsAsync<ApiCallException>(() => client.LocationCurrentTemperature(10, 20));
+        }
+
+        [Fact]
         public async Task HttpRequestError()
         {
             var json = """
