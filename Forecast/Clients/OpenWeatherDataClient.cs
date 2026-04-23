@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Forecast.Models.Weather;
 using Forecast.Utils;
 
 namespace Forecast.Clients;
@@ -45,6 +46,12 @@ public class OpenWeatherDataClient : IWeatherDataClient
             throw new ApiCallException($"failed to call openweather: {e.Message}.", inner: e);
         }
     }
+
+    public Task<DailyForecast> ForecastForDays(decimal latitude, decimal longitude, int days)
+    {
+        throw new NotImplementedException();
+    }
+
 }
 
 public class OpenWeatherResponse
@@ -57,4 +64,31 @@ public class OpenWeatherResponse
         [JsonPropertyName("temp")]
         public decimal Temp { get; set; }
     }
+}
+
+public class OpenWeatherForecastResponse
+{
+    [JsonPropertyName("list")]
+    public List<OpenWeatherForecastList> List { get; set; }
+}
+
+public class OpenWeatherForecastList
+{
+    [JsonPropertyName("temp")]
+    public OpenWeatherForecastTempreture Temperature { get; set; }
+
+    [JsonPropertyName("humidity")]
+    public decimal Humidity { get; set; }
+
+    [JsonPropertyName("speed")]
+    public decimal Speed { get; set; }
+}
+
+public class OpenWeatherForecastTempreture
+{
+    [JsonPropertyName("min")]
+    public decimal Min { get; set; }
+
+    [JsonPropertyName("max")]
+    public decimal Max { get; set; }
 }
