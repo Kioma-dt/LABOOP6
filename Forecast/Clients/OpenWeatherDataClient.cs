@@ -3,7 +3,7 @@ using Forecast.Utils;
 
 namespace Forecast.Clients;
 
-class OpenWeatherDataClient : IWeatherDataClient
+public class OpenWeatherDataClient : IWeatherDataClient
 {
     private readonly HttpClient client;
     private readonly string apiKey;
@@ -40,7 +40,7 @@ class OpenWeatherDataClient : IWeatherDataClient
     }
 }
 
-class OpenWeatherResponse
+public class OpenWeatherResponse
 {
     [JsonPropertyName("main")]
     public required Nested Main { get; set; }
