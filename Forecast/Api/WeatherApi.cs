@@ -22,7 +22,7 @@ public static class WeatherApi
         return groups;
     }
 
-    private static async Task<
+    public static async Task<
         Results<Ok<Success<CurrentWeather>>, BadRequest<Status>, InternalServerError<Status>>
     > HandleGetCurrentWeather(
         [FromServices] CurrentWeatherController controller,

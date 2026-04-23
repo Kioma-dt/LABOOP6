@@ -12,7 +12,7 @@ namespace Forecast.Tests.Clients
     public class OpenWeatherDataClientTests
     {
         [Fact]
-        public async Task ReturnsCorrectTemperature()
+        public async Task CorrectTemperature()
         {
             var json = """
                 {
@@ -105,7 +105,7 @@ namespace Forecast.Tests.Clients
         }
 
         [Fact]
-        public async Task CheckCorrectRequsetUrl()
+        public async Task CorrectRequsetUrl()
         {
             HttpRequestMessage? capturedRequest = null;
 
