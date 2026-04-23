@@ -3,13 +3,16 @@ using Forecast.Models.Weather;
 
 namespace Forecast.Controllers;
 
-public class CurrentWeatherController(IWeatherDataClient client)
+public class CurrentWeatherController(IWeatherDataClientProvider clientProvider)
 {
-    private readonly IWeatherDataClient client = client;
+    private readonly IWeatherDataClientProvider clientProvider = clientProvider;
 
-    public async Task<CurrentWeather> GetCurrentWeather(decimal latitude, decimal longitude)
+    public async Task<CurrentWeather> GetCurrentWeather(decimal latitude, decimal longitude, string? provider = null)
     {
-        var temperature = await client.LocationCurrentTemperature(latitude, longitude);
+        var temperature = await clientProvider
+            .GetWeatherDataClient(provider)
+            .LocationCurrentTemperature(latitude, longitude);
+
         return new(temperature);
     }
 }

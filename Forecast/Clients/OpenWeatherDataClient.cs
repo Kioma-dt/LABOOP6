@@ -16,6 +16,8 @@ public class OpenWeatherDataClient : IWeatherDataClient
         apiKey = config.GetValue<string>("OPENWEATHER_API_KEY") ?? "";
     }
 
+    public string Provider => throw new NotImplementedException();
+
     public async Task<decimal> LocationCurrentTemperature(decimal latitude, decimal longitude)
     {
         try

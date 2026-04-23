@@ -18,7 +18,10 @@ builder.Services.AddOpenApiDocument(config =>
     config.Version = "v1";
 });
 builder.Services.AddHttpClient<OpenWeatherDataClient>();
+builder.Services.AddHttpClient<GoogleWeatherDataClient>();
 builder.Services.AddSingleton<IWeatherDataClient, OpenWeatherDataClient>();
+builder.Services.AddSingleton<IWeatherDataClient, GoogleWeatherDataClient>();
+builder.Services.AddSingleton<IWeatherDataClientProvider, WeatherDataClientProvider>();
 builder.Services.AddSingleton<CurrentWeatherController>();
 
 var app = builder.Build();
