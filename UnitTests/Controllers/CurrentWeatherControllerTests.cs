@@ -10,7 +10,7 @@ namespace Forecast.Tests.Controllers
     public class CurrentWeatherControllerTests
     {
         [Fact]
-        public async Task RettrunsCorrectTemperature()
+        public async Task ReturnsCorrectTemperature()
         {
             var clientMock = new Mock<IWeatherDataClient>();
 
