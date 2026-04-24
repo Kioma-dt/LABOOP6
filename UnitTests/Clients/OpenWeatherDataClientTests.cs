@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Forecast.Tests.Clients
 {
-    public class OpenWeatherDataClientTests
+    public class OpenWeatherDataClientCurrentTempretureTests
     {
         [Fact]
         public async Task CorrectTemperature()
