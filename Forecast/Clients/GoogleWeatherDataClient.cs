@@ -74,6 +74,9 @@ namespace Forecast.Clients
 
     public class GoogleWeatherForecastDay
     {
+        [JsonPropertyName("displayDate")]
+        public GoogleWeatherDisplayDate DisplayDate { get; set; }
+
         [JsonPropertyName("daytimeForecast")]
         public GoogleWeatherDaytimeForecast DaytimeForecast { get; set; }
 
@@ -82,6 +85,18 @@ namespace Forecast.Clients
 
         [JsonPropertyName("minTemperature")]
         public GoogleWeatherForecastMinTemperature MinTemperature { get; set; }
+    }
+
+    public class GoogleWeatherDisplayDate
+    {
+        [JsonPropertyName("year")]
+        public int Year { get; set; }
+
+        [JsonPropertyName("month")]
+        public int Month { get; set; }
+
+        [JsonPropertyName("day")]
+        public int Day { get; set; }
     }
 
     public class GoogleWeatherDaytimeForecast

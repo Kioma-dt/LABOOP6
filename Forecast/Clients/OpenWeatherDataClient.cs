@@ -24,7 +24,7 @@ public class OpenWeatherDataClient : IWeatherDataClient
         try
         {
             var response = await client.GetAsync(
-                $"?lat={latitude}&lon={longitude}&appid={apiKey}&units=metric"
+                $"?weather/lat={latitude}&lon={longitude}&appid={apiKey}&units=metric"
             );
 
             if (!response.IsSuccessStatusCode)
@@ -47,9 +47,51 @@ public class OpenWeatherDataClient : IWeatherDataClient
         }
     }
 
-    public Task<DailyForecast> ForecastForDays(decimal latitude, decimal longitude, int days)
+    public async Task<DailyForecast> ForecastForDays(decimal latitude, decimal longitude, int days)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var response = await client.GetAsync(
+                $"?forecast/daily?lat={latitude}&lon={longitude}&cnt={days}&appid={apiKey}&units=metric"
+            );
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApiCallException(
+                    $"openweather returned bad status: {(ushort)response.StatusCode}"
+                );
+            }
+
+            var data = await response.Content.ReadFromJsonAsync<OpenWeatherForecastResponse>();
+
+            if (data is null || data.List is null)
+            {
+                throw new ApiCallException($"failed to decode response");
+            }
+
+            var dailyForecast = new DailyForecast();
+
+            foreach (var item in data.List) 
+            {
+                dailyForecast.DayForecasts.Add(new DayForecast()
+                {
+                    Date = DateTimeOffset.FromUnixTimeSeconds(item.Date).UtcDateTime,
+                    MaxTempreture = item.Temperature.Max,
+                    MinTempreture = item.Temperature.Min,
+                    Humidity = item.Humidity,
+                    WindSpeed = item.Speed
+                });
+            }
+            return dailyForecast;
+        }
+        catch (JsonException e)
+        {
+            throw new ApiCallException($"failed to deserialize: {e.Message}.", inner: e);
+        }
+        catch (HttpRequestException e)
+        {
+            throw new ApiCallException($"failed to call openweather: {e.Message}.", inner: e);
+        }
     }
 
 }

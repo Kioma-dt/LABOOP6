@@ -262,7 +262,7 @@ namespace Forecast.Tests.Clients
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new GoogleWeatherDataClient(configuration, httpClient);
+            var client = new OpenWeatherDataClient(configuration, httpClient);
 
             await client.ForecastForDays(10, 20, 2);
 
