@@ -49,9 +49,16 @@ namespace Forecast.Clients
             }
         }
 
-        public Task<IEnumerable<CurrentWeather>> LocationCurrentTemperature(IEnumerable<Location> locations)
+        public async Task<IEnumerable<CurrentWeather>> LocationCurrentTemperature(IEnumerable<Location> locations)
         {
-            throw new NotImplementedException();
+            var tempretures = new List<CurrentWeather>();
+            foreach (var location in locations)
+            {
+                var temp = await LocationCurrentTemperature(location.Latitude, location.Longitude);
+                tempretures.Add(new(temp));
+            }
+
+            return tempretures;
         }
 
         public async Task<DailyForecast> ForecastForDays(decimal latitude, decimal longitude, int days)
