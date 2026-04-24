@@ -471,7 +471,7 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["GOOGLEWEATHER_BASE_URL"] = "http://someurl",
+                ["GOOGLEWEATHER_BASE_URL"] = "http://someurl/",
                 ["GOOGLEWEATHER_API_KEY"] = "somekey"
             };
 
