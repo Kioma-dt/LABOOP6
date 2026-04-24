@@ -9,15 +9,16 @@ using Xunit;
 
 namespace Forecast.Tests.Clients
 {
-    public class OpenWeatherDataClientCurrentTempretureTests
+    public class GoogleWeatherDataClientCurrentTempretureTests
     {
         [Fact]
         public async Task CorrectTemperature()
         {
             var json = """
                 {
-                    "main": {
-                        "temp": 30
+                    "temperature": {
+                      "degrees": 30,
+                      "unit": "CELSIUS"
                     }
                 }
                 """;
@@ -32,15 +33,15 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
-                ["OPENWEATHER_API_KEY"] = "somekey"
+                ["GOOGLEWEATHER_BASE_URL"] = "http://someurl",
+                ["GOOGLEWEATHER_API_KEY"] = "somekey"
             };
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new GoogleWeatherDataClient(configuration, httpClient);
 
             var temp = await client.LocationCurrentTemperature(10, 20);
 
@@ -57,15 +58,15 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
-                ["OPENWEATHER_API_KEY"] = "somekey"
+                ["GOOGLEWEATHER_BASE_URL"] = "http://someurl",
+                ["GOOGLEWEATHER_API_KEY"] = "somekey"
             };
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new GoogleWeatherDataClient(configuration, httpClient);
 
             await Assert.ThrowsAsync<ApiCallException>(() => client.LocationCurrentTemperature(10, 20));
         }
@@ -89,15 +90,15 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
-                ["OPENWEATHER_API_KEY"] = "somekey"
+                ["GOOGLEWEATHER_BASE_URL"] = "http://someurl",
+                ["GOOGLEWEATHER_API_KEY"] = "somekey"
             };
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new GoogleWeatherDataClient(configuration, httpClient);
 
             await Assert.ThrowsAsync<ApiCallException>(() => client.LocationCurrentTemperature(10, 20));
         }
@@ -107,9 +108,10 @@ namespace Forecast.Tests.Clients
         {
             var json = """
                 {
-                    "main": {
-                        "temp": 30
-                    }
+                    "temperature": {
+                          "degrees": 30,
+                          "unit": "CELSIUS"
+                        }
                 }
                 """;
 
@@ -123,15 +125,15 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
-                ["OPENWEATHER_API_KEY"] = "somekey"
+                ["GOOGLEWEATHER_BASE_URL"] = "http://someurl",
+                ["GOOGLEWEATHER_API_KEY"] = "somekey"
             };
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new GoogleWeatherDataClient(configuration, httpClient);
 
             await Assert.ThrowsAsync<ApiCallException>(() => client.LocationCurrentTemperature(10, 20));
         }
@@ -154,58 +156,32 @@ namespace Forecast.Tests.Clients
                 })
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent("""{"main":{"temp":30}}""")
+                    Content = new StringContent("""{"temperature":{"degrees": 30,"unit": "CELSIUS"}}""")
                 });
 
             var httpClient = new HttpClient(handler.Object);
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
-                ["OPENWEATHER_API_KEY"] = "somekey"
+                ["GOOGLEWEATHER_BASE_URL"] = "http://someurl/",
+                ["GOOGLEWEATHER_API_KEY"] = "somekey"
             };
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new GoogleWeatherDataClient(configuration, httpClient);
 
             await client.LocationCurrentTemperature(10, 20);
 
             var url = capturedRequest!.RequestUri!.ToString();
 
-            Assert.Contains("/weather?", url);
             Assert.Contains("http://someurl", url);
-            Assert.Contains("lat=10", url);
-            Assert.Contains("lon=20", url);
-            Assert.Contains("appid=somekey", url);
+            Assert.Contains("/currentConditions:lookup?", url);
+            Assert.Contains("location.latitude=10", url);
+            Assert.Contains("location.longitude=20", url);
+            Assert.Contains("key=somekey", url);
         }
     }
 }
-
-
-
-    public class MyHttpMessageHandler : HttpMessageHandler
-    {
-        readonly HttpResponseMessage response;
-        readonly bool except;
-
-        public MyHttpMessageHandler(HttpResponseMessage response, bool except = false)
-        {
-            this.response = response;
-            this.except = except;
-        }
-
-        protected override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            if (except)
-            {
-                throw new HttpRequestException();
-            }
-
-            return Task.FromResult(response);
-        }
-    }

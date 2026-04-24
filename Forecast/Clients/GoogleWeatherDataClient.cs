@@ -53,7 +53,7 @@ namespace Forecast.Clients
             try
             {
                 var response = await client.GetAsync(
-                    $"forecast/days:lookup?key={apiKey}&location.latitude={latitude}&location.longitude={longitude}&days={days}"
+                    $"/forecast/days:lookup?key={apiKey}&location.latitude={latitude}&location.longitude={longitude}&days={days}"
                 );
 
                 if (!response.IsSuccessStatusCode)
