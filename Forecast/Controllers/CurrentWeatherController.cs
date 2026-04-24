@@ -4,9 +4,10 @@ using Forecast.Shared.Requstes;
 
 namespace Forecast.Controllers;
 
-public class CurrentWeatherController(IWeatherDataClientProvider clientProvider)
+public class CurrentWeatherController(IWeatherDataClientProvider clientProvider, ILocationDataClient locationClient)
 {
     private readonly IWeatherDataClientProvider clientProvider = clientProvider;
+    private readonly ILocationDataClient locationClient = locationClient;
 
     public async Task<CurrentWeather> GetCurrentWeather(decimal latitude, decimal longitude, string? provider = null)
     {
@@ -26,11 +27,15 @@ public class CurrentWeatherController(IWeatherDataClientProvider clientProvider)
 
     public async Task<CurrentWeather> GetCurrentWeatherByCity(string city, string countryCode, string? provider = null)
     {
-        throw new NotImplementedException();
+       var location = await locationClient.CityLocation(city, countryCode);
+
+        return await GetCurrentWeather(location.Latitude, location.Longitude, provider);
     }
 
     public async Task<IEnumerable<CurrentWeather>> GetCurrentWeatherByCity(MultipleCitiesRequest? request, string? provider = null)
     {
-        throw new NotImplementedException();
+        var locations = await locationClient.CityLocation(request?.Cities);
+
+        return await GetCurrentWeather(new MultipleLocationsRequest() { Locations = locations.ToList() }, provider);
     }
 }

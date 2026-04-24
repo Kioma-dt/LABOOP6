@@ -3,9 +3,10 @@ using Forecast.Models.Weather;
 
 namespace Forecast.Controllers
 {
-    public class ForecastController(IWeatherDataClientProvider clientProvider)
+    public class ForecastController(IWeatherDataClientProvider clientProvider, ILocationDataClient locationClient)
     {
         private readonly IWeatherDataClientProvider clientProvider = clientProvider;
+        private readonly ILocationDataClient locationClient = locationClient;
 
         public async Task<DailyForecast> GetDailyForecast(decimal latitude, decimal longitude, int days, string? provider = null)
         {
@@ -14,9 +15,11 @@ namespace Forecast.Controllers
                 .ForecastForDays(latitude, longitude, days);
         }
 
-        public async Task<DailyForecast> GetDailyForecastByCity(string city, string countryCode, string? provider = null)
+        public async Task<DailyForecast> GetDailyForecastByCity(string city, string countryCode, int days, string? provider = null)
         {
-            throw new NotImplementedException();
+            var location = await locationClient.CityLocation(city, countryCode);
+
+            return await GetDailyForecast(location.Latitude, location.Longitude, days, provider);
         }
 
     }

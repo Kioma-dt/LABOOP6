@@ -3,12 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace Forecast.Shared.Responses.OpenWeather
 {
-    public class OpenWeatherLocationResponse
-    {
-        public List<OpenWeatherLocationResponseCity> Cities { get; set; } = new();
-    }
+    //public class OpenWeatherLocationResponse
+    //{
+    //    public List<OpenWeatherLocationResponseCity> Cities { get; set; } = new();
+    //}
 
-    public class OpenWeatherLocationResponseCity
+    public class OpenWeatherLocationResponse
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }

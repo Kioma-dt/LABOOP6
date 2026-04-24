@@ -25,7 +25,7 @@ public class OpenWeatherDataClient : IWeatherDataClient
         try
         {
             var response = await client.GetAsync(
-                $"?/weather?lat={latitude}&lon={longitude}&appid={apiKey}&units=metric"
+                $"/weather?lat={latitude}&lon={longitude}&appid={apiKey}&units=metric"
             );
 
             if (!response.IsSuccessStatusCode)

@@ -230,7 +230,7 @@ namespace Forecast.Tests.Clients
 
             await client.CityLocation("London", "GB");
 
-            var url = capturedRequest!.RequestUri!.ToString();
+            var url = capturedRequest!.RequestUri!.ToString().ToLower();
 
             Assert.Contains("http://someurl", url);
             Assert.Contains("/direct?", url);
