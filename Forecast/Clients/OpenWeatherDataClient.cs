@@ -74,6 +74,9 @@ public class OpenWeatherForecastResponse
 
 public class OpenWeatherForecastList
 {
+    [JsonPropertyName("dt")]
+    public int Date { get; set; }
+
     [JsonPropertyName("temp")]
     public OpenWeatherForecastTempreture Temperature { get; set; }
 

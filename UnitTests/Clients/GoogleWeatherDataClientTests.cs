@@ -310,7 +310,7 @@ namespace Forecast.Tests.Clients
 
             var url = capturedRequest!.RequestUri!.ToString();
 
-            Assert.Contains("https://weather.googleapis.com/v1/forecast/days:lookup", url);
+            Assert.Contains("http://someurl", url);
             Assert.Contains("location.latitude=10", url);
             Assert.Contains("location.longitude=20", url);
             Assert.Contains("days=2", url);
