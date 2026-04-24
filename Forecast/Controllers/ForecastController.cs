@@ -13,5 +13,11 @@ namespace Forecast.Controllers
                 .GetWeatherDataClient(provider)
                 .ForecastForDays(latitude, longitude, days);
         }
+
+        public async Task<DailyForecast> GetDailyForecastByCity(string city, string countryCode, string? provider = null)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

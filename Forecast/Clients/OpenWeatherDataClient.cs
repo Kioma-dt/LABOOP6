@@ -48,9 +48,15 @@ public class OpenWeatherDataClient : IWeatherDataClient
         }
     }
 
-    public async Task<IEnumerable<CurrentWeather>> LocationCurrentTemperature(IEnumerable<Location> locations)
+    public async Task<IEnumerable<CurrentWeather>> LocationCurrentTemperature(IEnumerable<Location>? locations)
     {
         var tempretures = new List<CurrentWeather>();
+
+        if (locations is null)
+        {
+            throw new ApiCallException($"failed to decode response");
+        }
+
         foreach (var location in locations) 
         {
             var temp = await LocationCurrentTemperature(location.Latitude, location.Longitude);

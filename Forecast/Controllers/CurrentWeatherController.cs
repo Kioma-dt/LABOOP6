@@ -17,7 +17,19 @@ public class CurrentWeatherController(IWeatherDataClientProvider clientProvider)
         return new(temperature);
     }
 
-    public async Task<IEnumerable<CurrentWeather>> GetCurrentWeather(MultipleLocationsRequest? locations, string? provider = null)
+    public async Task<IEnumerable<CurrentWeather>> GetCurrentWeather(MultipleLocationsRequest? request, string? provider = null)
+    {
+        return await clientProvider
+            .GetWeatherDataClient(provider)
+            .LocationCurrentTemperature(request?.Locations);
+    }
+
+    public async Task<CurrentWeather> GetCurrentWeatherByCity(string city, string countryCode, string? provider = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<CurrentWeather>> GetCurrentWeatherByCity(MultipleCitiesRequest? request, string? provider = null)
     {
         throw new NotImplementedException();
     }
