@@ -49,6 +49,42 @@ namespace Forecast.Tests.Clients
         }
 
         [Fact]
+        public async Task MultipleLocationsNullRequest()
+        {
+            var json = """
+                {
+                    "temperature": {
+                      "degrees": 30,
+                      "unit": "CELSIUS"
+                    }
+                }
+                """;
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(json)
+            };
+
+            var handler = new MyHttpMessageHandler(response);
+            var httpClient = new HttpClient(handler);
+
+            var inMemorySettings = new Dictionary<string, string?>
+            {
+                ["GOOGLEWEATHER_BASE_URL"] = "http://someurl",
+                ["GOOGLEWEATHER_API_KEY"] = "somekey"
+            };
+
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            var client = new GoogleWeatherDataClient(configuration, httpClient);
+
+            await Assert.ThrowsAsync<ApiCallException>(() => client.LocationCurrentTemperature(null));
+        }
+
+        [Fact]
         public async Task BadRequestStatucCodeFromServer()
         {
             var response = new HttpResponseMessage(HttpStatusCode.BadRequest);

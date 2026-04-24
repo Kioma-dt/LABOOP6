@@ -1,25 +1,32 @@
 ﻿using Forecast.Clients;
-using Forecast.Controllers;
 using Forecast.Utils;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Forecast.Tests.Clients
 {
-    public class OpenWeatherDataClientCurrentTempretureTests
+    public class OpenWeatherLocationDataClientTests
     {
         [Fact]
-        public async Task CorrectTemperature()
+        public async Task CorrectLocation()
         {
             var json = """
+                [
                 {
-                    "main": {
-                        "temp": 30
-                    }
+                  "name": "London",
+                  "lat": 10,
+                  "lon": 20,
+                  "country": "GB"
                 }
+                ]
                 """;
 
             var response = new HttpResponseMessage(HttpStatusCode.OK)
@@ -32,7 +39,7 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
+                ["OPENWEATHERLOCATION_BASE_URL"] = "http://someurl",
                 ["OPENWEATHER_API_KEY"] = "somekey"
             };
 
@@ -40,22 +47,26 @@ namespace Forecast.Tests.Clients
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new OpenWeatherLocationDataClient(configuration, httpClient);
 
-            var temp = await client.LocationCurrentTemperature(10, 20);
+            var location = await client.CityLocation("London", "GB");
 
-            Assert.Equal(30, temp);
+            Assert.Equal(10, location.Latitude);
+            Assert.Equal(20, location.Longitude);
         }
 
         [Fact]
         public async Task MultipleLocationsNullRequest()
         {
             var json = """
+                [
                 {
-                    "main": {
-                        "temp": 30
-                    }
+                  "name": "London",
+                  "lat": 10,
+                  "lon": 20,
+                  "country": "GB"
                 }
+                ]
                 """;
 
             var response = new HttpResponseMessage(HttpStatusCode.OK)
@@ -68,18 +79,17 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
+                ["OPENWEATHERLOCATION_BASE_URL"] = "http://someurl",
                 ["OPENWEATHER_API_KEY"] = "somekey"
             };
-
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new OpenWeatherLocationDataClient(configuration, httpClient);
 
-            await Assert.ThrowsAsync<ApiCallException>(() => client.LocationCurrentTemperature(null));
+            await Assert.ThrowsAsync<ApiCallException>(() => client.CityLocation(null));
         }
 
         [Fact]
@@ -92,7 +102,7 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
+                ["OPENWEATHERLOCATION_BASE_URL"] = "http://someurl",
                 ["OPENWEATHER_API_KEY"] = "somekey"
             };
 
@@ -100,9 +110,9 @@ namespace Forecast.Tests.Clients
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new OpenWeatherLocationDataClient(configuration, httpClient);
 
-            await Assert.ThrowsAsync<ApiCallException>(() => client.LocationCurrentTemperature(10, 20));
+            await Assert.ThrowsAsync<ApiCallException>(() => client.CityLocation("London", "GB"));
         }
 
         [Fact]
@@ -110,7 +120,7 @@ namespace Forecast.Tests.Clients
         {
             var json = """
                 {
-
+                    "somejson" : 1
                 }
                 """;
 
@@ -124,7 +134,7 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
+                ["OPENWEATHERLOCATION_BASE_URL"] = "http://someurl",
                 ["OPENWEATHER_API_KEY"] = "somekey"
             };
 
@@ -132,20 +142,23 @@ namespace Forecast.Tests.Clients
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new OpenWeatherLocationDataClient(configuration, httpClient);
 
-            await Assert.ThrowsAsync<ApiCallException>(() => client.LocationCurrentTemperature(10, 20));
+            await Assert.ThrowsAsync<ApiCallException>(() => client.CityLocation("London", "GB"));
         }
 
         [Fact]
         public async Task HttpRequestError()
         {
             var json = """
-                {
-                    "main": {
-                        "temp": 30
+                [
+                    {
+                      "name": "London",
+                      "lat": 10,
+                      "lon": 20,
+                      "country": "GB"
                     }
-                }
+                ]
                 """;
 
             var response = new HttpResponseMessage(HttpStatusCode.OK)
@@ -158,7 +171,7 @@ namespace Forecast.Tests.Clients
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
+                ["OPENWEATHERLOCATION_BASE_URL"] = "http://someurl",
                 ["OPENWEATHER_API_KEY"] = "somekey"
             };
 
@@ -166,9 +179,9 @@ namespace Forecast.Tests.Clients
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new OpenWeatherLocationDataClient(configuration, httpClient);
 
-            await Assert.ThrowsAsync<ApiCallException>(() => client.LocationCurrentTemperature(10, 20));
+            await Assert.ThrowsAsync<ApiCallException>(() => client.CityLocation("London", "GB"));
         }
 
         [Fact]
@@ -189,14 +202,23 @@ namespace Forecast.Tests.Clients
                 })
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent("""{"main":{"temp":30}}""")
+                    Content = new StringContent("""
+                        [
+                            {
+                              "name": "London",
+                              "lat": 10,
+                              "lon": 20,
+                              "country": "GB"
+                            }
+                        ]
+                        """)
                 });
 
             var httpClient = new HttpClient(handler.Object);
 
             var inMemorySettings = new Dictionary<string, string?>
             {
-                ["OPENWEATHER_BASE_URL"] = "http://someurl",
+                ["OPENWEATHERLOCATION_BASE_URL"] = "http://someurl",
                 ["OPENWEATHER_API_KEY"] = "somekey"
             };
 
@@ -204,43 +226,16 @@ namespace Forecast.Tests.Clients
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var client = new OpenWeatherDataClient(configuration, httpClient);
+            var client = new OpenWeatherLocationDataClient(configuration, httpClient);
 
-            await client.LocationCurrentTemperature(10, 20);
+            await client.CityLocation("London", "GB");
 
             var url = capturedRequest!.RequestUri!.ToString();
 
-            Assert.Contains("/weather?", url);
             Assert.Contains("http://someurl", url);
-            Assert.Contains("lat=10", url);
-            Assert.Contains("lon=20", url);
+            Assert.Contains("/direct?", url);
+            Assert.Contains("q=london,gb", url);
             Assert.Contains("appid=somekey", url);
         }
     }
 }
-
-
-
-    public class MyHttpMessageHandler : HttpMessageHandler
-    {
-        readonly HttpResponseMessage response;
-        readonly bool except;
-
-        public MyHttpMessageHandler(HttpResponseMessage response, bool except = false)
-        {
-            this.response = response;
-            this.except = except;
-        }
-
-        protected override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            if (except)
-            {
-                throw new HttpRequestException();
-            }
-
-            return Task.FromResult(response);
-        }
-    }
