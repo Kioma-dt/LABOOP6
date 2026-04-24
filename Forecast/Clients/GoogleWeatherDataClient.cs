@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Forecast.Models.Weather;
+using Forecast.Shared.Responses.GoogleWeather;
 
 namespace Forecast.Clients
 {
@@ -35,7 +36,7 @@ namespace Forecast.Clients
                     );
                 }
 
-                var data = await response.Content.ReadFromJsonAsync<GoogleWeatherResponse>();
+                var data = await response.Content.ReadFromJsonAsync<GoogleWeatherTemretureResponse>();
                 return data?.Tempreature?.Degrees ?? throw new ApiCallException($"failed to decode response");
             }
             catch (JsonException e)
@@ -46,6 +47,11 @@ namespace Forecast.Clients
             {
                 throw new ApiCallException($"failed to call googleweather: {e.Message}.", inner: e);
             }
+        }
+
+        public Task<IEnumerable<CurrentWeather>> LocationCurrentTemperature(IEnumerable<Location> locations)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<DailyForecast> ForecastForDays(decimal latitude, decimal longitude, int days)
@@ -94,83 +100,5 @@ namespace Forecast.Clients
                 throw new ApiCallException($"failed to call googleweather: {e.Message}.", inner: e);
             }
         }
-    }
-
-    public class GoogleWeatherResponse
-    {
-        [JsonPropertyName("temperature")]
-        public required Nested Tempreature { get; set; }
-
-        public class Nested
-        {
-            [JsonPropertyName("degrees")]
-            public decimal Degrees { get; set; }
-        }
-    }
-
-    public class GoogleWeatherForecastResponse
-    {
-        [JsonPropertyName("forecastDays")]
-        public List<GoogleWeatherForecastDay> ForecastDays { get; set; }
-    }
-
-    public class GoogleWeatherForecastDay
-    {
-        [JsonPropertyName("displayDate")]
-        public GoogleWeatherDisplayDate DisplayDate { get; set; }
-
-        [JsonPropertyName("daytimeForecast")]
-        public GoogleWeatherDaytimeForecast DaytimeForecast { get; set; }
-
-        [JsonPropertyName("maxTemperature")]
-        public GoogleWeatherForecastMaxTemperature MaxTemperature { get; set; }
-
-        [JsonPropertyName("minTemperature")]
-        public GoogleWeatherForecastMinTemperature MinTemperature { get; set; }
-    }
-
-    public class GoogleWeatherDisplayDate
-    {
-        [JsonPropertyName("year")]
-        public int Year { get; set; }
-
-        [JsonPropertyName("month")]
-        public int Month { get; set; }
-
-        [JsonPropertyName("day")]
-        public int Day { get; set; }
-    }
-
-    public class GoogleWeatherDaytimeForecast
-    {
-        [JsonPropertyName("relativeHumidity")]
-        public decimal RelativeHumidity { get; set; }
-
-        [JsonPropertyName("wind")]
-        public GoogleWeatherForecastWind Wind { get; set; }
-    }
-
-    public class GoogleWeatherForecastWind
-    {
-        [JsonPropertyName("speed")]
-        public GoogleWeatherForecastSpeed Speed { get; set; }
-    }
-
-    public class GoogleWeatherForecastSpeed
-    {
-        [JsonPropertyName("value")]
-        public decimal Value { get; set; }
-    }
-
-    public class GoogleWeatherForecastMaxTemperature
-    {
-        [JsonPropertyName("degrees")]
-        public decimal Degrees { get; set; }
-    }
-
-    public class GoogleWeatherForecastMinTemperature
-    {
-        [JsonPropertyName("degrees")]
-        public decimal Degrees { get; set; }
     }
 }

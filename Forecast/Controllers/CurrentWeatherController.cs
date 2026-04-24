@@ -1,5 +1,6 @@
 using Forecast.Clients;
 using Forecast.Models.Weather;
+using Forecast.Shared.Requstes;
 
 namespace Forecast.Controllers;
 
@@ -14,5 +15,10 @@ public class CurrentWeatherController(IWeatherDataClientProvider clientProvider)
             .LocationCurrentTemperature(latitude, longitude);
 
         return new(temperature);
+    }
+
+    public async Task<IEnumerable<CurrentWeather>> GetCurrentWeather(MultipleLocationsRequest? locations, string? provider = null)
+    {
+        throw new NotImplementedException();
     }
 }

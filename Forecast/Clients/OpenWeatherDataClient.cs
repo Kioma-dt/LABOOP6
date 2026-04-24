@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Forecast.Models.Weather;
 using Forecast.Utils;
+using Forecast.Shared.Responses.OpenWeather;
 
 namespace Forecast.Clients;
 
@@ -34,7 +35,7 @@ public class OpenWeatherDataClient : IWeatherDataClient
                 );
             }
 
-            var data = await response.Content.ReadFromJsonAsync<OpenWeatherResponse>();
+            var data = await response.Content.ReadFromJsonAsync<OpenWeatherTemretureResponse>();
             return data?.Main?.Temp ?? throw new ApiCallException($"failed to decode response");
         }
         catch (JsonException e)
@@ -45,6 +46,11 @@ public class OpenWeatherDataClient : IWeatherDataClient
         {
             throw new ApiCallException($"failed to call openweather: {e.Message}.", inner: e);
         }
+    }
+
+    public Task<IEnumerable<CurrentWeather>> LocationCurrentTemperature(IEnumerable<Location> locations)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<DailyForecast> ForecastForDays(decimal latitude, decimal longitude, int days)
@@ -94,46 +100,4 @@ public class OpenWeatherDataClient : IWeatherDataClient
         }
     }
 
-}
-
-public class OpenWeatherResponse
-{
-    [JsonPropertyName("main")]
-    public required Nested Main { get; set; }
-
-    public class Nested
-    {
-        [JsonPropertyName("temp")]
-        public decimal Temp { get; set; }
-    }
-}
-
-public class OpenWeatherForecastResponse
-{
-    [JsonPropertyName("list")]
-    public List<OpenWeatherForecastList> List { get; set; }
-}
-
-public class OpenWeatherForecastList
-{
-    [JsonPropertyName("dt")]
-    public int Date { get; set; }
-
-    [JsonPropertyName("temp")]
-    public OpenWeatherForecastTempreture Temperature { get; set; }
-
-    [JsonPropertyName("humidity")]
-    public decimal Humidity { get; set; }
-
-    [JsonPropertyName("speed")]
-    public decimal Speed { get; set; }
-}
-
-public class OpenWeatherForecastTempreture
-{
-    [JsonPropertyName("min")]
-    public decimal Min { get; set; }
-
-    [JsonPropertyName("max")]
-    public decimal Max { get; set; }
 }

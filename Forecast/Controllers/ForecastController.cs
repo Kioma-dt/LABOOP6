@@ -9,7 +9,9 @@ namespace Forecast.Controllers
 
         public async Task<DailyForecast> GetDailyForecast(decimal latitude, decimal longitude, int days, string? provider = null)
         {
-            throw new NotImplementedException();
+            return await clientProvider
+                .GetWeatherDataClient(provider)
+                .ForecastForDays(latitude, longitude, days);
         }
     }
 }
